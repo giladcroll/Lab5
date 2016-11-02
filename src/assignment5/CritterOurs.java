@@ -1,12 +1,12 @@
 /* CRITTERS Critter.java
  * EE422C Project 4 submission by
  * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
+ * Gilad Croll
+ * GC24654
+ * 16445
+ * Alejandro Stevenson Duran
+ * AS72948
+ * 16455
  * Slip days used: <0>
  * Fall 2016
  */
@@ -28,6 +28,8 @@ public abstract class Critter {
 	private boolean haveMoved;	// indicates if critter has walked/run for a current timestep
 	private boolean inFight;
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
+	
+	
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
 		Map world = new Map();
@@ -85,16 +87,16 @@ public abstract class Critter {
 			y_coord = incrementCoord(y_coord,Params.world_height);
 		}
 		// if the new position is occupied, and this critter is in a fight, go back
-		if(inFight && (!isFree(x_coord,y_coord) || haveMoved)){	
+		if(inFight && (!isFree(x_coord,y_coord,this) || haveMoved)){	
 			x_coord = init_x;
 			y_coord = init_y;
 		}
 		energy -= Params.walk_energy_cost; 
 	}
 	
-	private static boolean isFree (int x,  int y){
+	private static boolean isFree (int x,  int y, Critter calling){
 		for(Critter c : population){
-			if((c.x_coord==x) && (c.y_coord==y)){ // means someone is already there
+			if((c.x_coord==x) && (c.y_coord==y) && c!=calling){ // means someone is already there
 				return false;
 			}
 		}
@@ -148,7 +150,8 @@ public abstract class Critter {
 	protected final void run(int direction) {
 		if(!inFight){
 			haveMoved = true;
-		}		int init_x = x_coord;
+		}	
+		int init_x = x_coord;
 		int init_y = y_coord;
 		if (direction == 0)
 			x_coord = incrementCoord2(x_coord, Params.world_width);
@@ -177,7 +180,7 @@ public abstract class Critter {
 			y_coord = incrementCoord2(y_coord,Params.world_height);
 		}
 		// if the new position is occupied, and this critter is in a fight, go back
-		if(inFight && (!isFree(x_coord,y_coord) || haveMoved)){	
+		if(inFight && (!isFree(x_coord,y_coord,this) || haveMoved)){	
 			x_coord = init_x;
 			y_coord = init_y;
 		}
@@ -253,16 +256,23 @@ public abstract class Critter {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public static void makeCritter(String critter_class_name) throws InvalidCritterException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-		Class<?> cls = Class.forName(myPackage+"."+critter_class_name);	// gets the class from string
-		Object newCrit=cls.newInstance();	// instantiate a new critter object
-		population.add((Critter) newCrit);	// add new critter to list
-		//newCrit.setX_coord(getRandomInt(Params.world_width));
-		((Critter)newCrit).x_coord = getRandomInt(Params.world_width);
-		((Critter)newCrit).y_coord = getRandomInt(Params.world_height);
-		((Critter)newCrit).energy = Params.start_energy; 
-
+	
+	
+	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
+		try{
+				Class<?> cls = Class.forName(myPackage+"."+critter_class_name);	// gets the class from string
+			Object newCrit=cls.newInstance();	// instantiate a new critter object
+			population.add((Critter) newCrit);	// add new critter to list
+			//newCrit.setX_coord(getRandomInt(Params.world_width));
+			((Critter)newCrit).x_coord = getRandomInt(Params.world_width);
+			((Critter)newCrit).y_coord = getRandomInt(Params.world_height);
+			((Critter)newCrit).energy = Params.start_energy; 
+			}
+			catch(Exception e){
+				throw new InvalidCritterException(critter_class_name);
+			}
 	}
+	
 	
 	/**
 	 * Gets a list of critters of a specific type.
@@ -370,8 +380,8 @@ public abstract class Critter {
 		Map.clearMap();
 	}
 	
-	public static void worldTimeStep() {
-		 //move babies to grown ups list
+	public static void worldTimeStep()  {
+		//move babies to grown ups list
 		population.addAll(babies);
 		babies.clear();
 		for (Critter c: population){	
@@ -385,24 +395,14 @@ public abstract class Critter {
 		// reproduce algae TODO
 		resolveEncounters();	//resolves all encounters
 		//add algaes
-	for(int i = 0; i < Params.refresh_algae_count; i++){
+		for(int i = 0; i < Params.refresh_algae_count; i++){
 			try {
-				Critter.makeCritter("Algae");
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvalidCritterException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}		
+				Critter.makeCritter("Algae");	
+			}catch(Exception e){
+				System.out.println("nothing");
+			}
+
 		}
-		
 	}
 	
 	private static void resolveEncounters(){
@@ -453,16 +453,19 @@ public abstract class Critter {
 			roll1 = getRandomInt(c1.energy+1);
 		if (want2) 
 			roll2 = getRandomInt(c2.energy+1);
-		if (roll1>roll2){	
-			c1.energy += c2.energy/2;	// c1, the winner, gets half energy of loser
-			population.remove(c2);	//remove loser from world
-			return c1;	// return the winner
+		if (c1.x_coord == c2.x_coord && c1.y_coord == c2.y_coord){
+			if (roll1>roll2){	
+				c1.energy += c2.energy/2;	// c1, the winner, gets half energy of loser
+				population.remove(c2);	//remove loser from world
+				return c1;	// return the winner
+			}
+			else{	// 
+				c2.energy += c1.energy/2;	// winner gets half energy of loser
+				population.remove(c1);	//remove loser from world
+				return c2;	// return the winner
+			}
 		}
-		else{	// 
-			c2.energy += c1.energy/2;	// winner gets half energy of loser
-			population.remove(c1);	//remove loser from world
-			return c2;	// return the winner
-		}
+		return null;
 	}
 	
 	/**
