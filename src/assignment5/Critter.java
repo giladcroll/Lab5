@@ -75,7 +75,30 @@ public abstract class Critter {
 	public abstract boolean fight(String oponent);
 	
 	
-	public static void worldTimeStep() {}
+	public static void worldTimeStep() throws Exception {
+		 //move babies to grown ups list
+		population.addAll(babies);
+		babies.clear();
+		for (Critter c: population){	
+			c.inFight = false;
+			c.haveMoved = false;
+			c.doTimeStep();	// doTimeStep for everyone
+			c.energy -= Params.rest_energy_cost;	// take energy off for resting
+		}
+		clearDead();	// clear all critters with not energy
+		// make them eat algae TODO
+		// reproduce algae TODO
+		resolveEncounters();	//resolves all encounters
+		//add algaes
+	for(int i = 0; i < Params.refresh_algae_count; i++){
+			try {
+				Critter.makeCritter("Algae");	
+		}catch(Exception e){
+			throw e;
+		}
+		
+	}
+	}
 	
 	public static void displayWorld() {}
 	
