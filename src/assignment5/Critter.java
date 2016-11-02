@@ -83,8 +83,23 @@ public abstract class Critter {
 	 * critter_class_name must be the name of a concrete subclass of Critter, if not
 	 * an InvalidCritterException must be thrown
 	 */
-	public static void makeCritter(String critter_class_name) throws InvalidCritterException {}
-	
+	public static void makeCritter(String critter_class_name) throws Exception {
+	try{
+			Class<?> cls = Class.forName(myPackage+"."+critter_class_name);	// gets the class from string
+		Object newCrit=cls.newInstance();	// instantiate a new critter object
+		population.add((Critter) newCrit);	// add new critter to list
+		//newCrit.setX_coord(getRandomInt(Params.world_width));
+		((Critter)newCrit).x_coord = getRandomInt(Params.world_width);
+		((Critter)newCrit).y_coord = getRandomInt(Params.world_height);
+		((Critter)newCrit).energy = Params.start_energy; 
+		}
+	catch(ClassNotFoundException e){
+		throw new InvalidCritterException(critter_class_name);
+		}
+	catch(Exception e){
+		throw e;
+		}
+	}	
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
 		return null;
 	}
