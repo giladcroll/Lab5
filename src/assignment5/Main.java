@@ -10,7 +10,7 @@
  * Slip days used: <0>
  * Fall 2016
  */
-package assignment5; // cannot be in default package
+package assignment4; // cannot be in default package
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -101,7 +101,11 @@ public class Main {
         	}
         	else if (inputWords[0].equals("step")){
         		if (inputWords.length == 1){
-        			Critter.worldTimeStep();
+        			try {
+						Critter.worldTimeStep();
+					} catch (Exception e) {
+						System.out.println("error processing: " + input);
+					}
         		}
         		else if (inputWords.length == 2){
         			// to do: exception catcher in this parsing function if input not a number or if number is negative!
