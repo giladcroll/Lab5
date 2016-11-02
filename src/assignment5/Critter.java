@@ -13,6 +13,7 @@
 package assignment5;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -71,7 +72,7 @@ public abstract class Critter {
 	
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
-		Map world = new Map();
+		World world = new World();
 	}
 	
 	private static java.util.Random rand = new java.util.Random();
@@ -416,7 +417,7 @@ public abstract class Critter {
 	 */
 	public static void clearWorld() {
 		population = new java.util.ArrayList<Critter>(); // is that fine or need to delete old object?
-		Map.clearMap();
+		World.clearMap();
 	}
 	
 	public static void worldTimeStep()  {
@@ -537,14 +538,14 @@ public abstract class Critter {
 	}
 	
 	public static void displayWorld() {
-		Map.clearMap();
+		World.clearMap();
 		for (Critter c: population){	
 			int x= c.x_coord;
 			int y= c.y_coord;
 			// map is set as [height][width], for some reason
-			Map.map[y][x] = c.toString(); // maybe?
+			World.map[y][x] = c.toString(); // maybe?
 		}
-		Map.displayMap();
+		World.displayMap();
 	}
 	
 }
