@@ -93,23 +93,24 @@ public class Main extends Application { static GridPane grid = new GridPane();
 }
 
 public static void main(String[] args) {
-	String myPackage;
-	myPackage = Critter.class.getPackage().toString().split(" ")[1];
-	File folder = new File(System.getProperty("user.dir") + "/src/" + myPackage );
-	File[] listOfFiles = folder.listFiles();
-	returnCritters(listOfFiles, myPackage);
+	
+	ArrayList<String> critters = returnCritters();
 	    
 	
 	
 	System.out.println();
-//	launch(args);
+	launch(args);
 }
 
 /**
  * returns all childs of critter in a string list 
  * @param Files
  */
-private static ArrayList<String> returnCritters(File[] files, String myPackage){
+private static ArrayList<String> returnCritters(){
+	String myPackage;
+	myPackage = Critter.class.getPackage().toString().split(" ")[1];
+	File folder = new File(System.getProperty("user.dir") + "/src/" + myPackage );
+	File[] files= folder.listFiles();
 	ArrayList<String> critterList = new ArrayList<String> ();
 	for (int i = 0; i < files.length; i++) {
 	      if (files[i].isFile()) {
