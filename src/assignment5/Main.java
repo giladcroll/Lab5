@@ -1,96 +1,85 @@
 package assignment5;
-import java.io.File;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import javax.swing.Painter;
 
-import assignment5.Critter;
-import javafx.application.Application; import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane; import javafx.stage.Stage;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+public class Main extends Application { 
+	
+	static GridPane grid = new GridPane();
+	//static GridPane grid2 = new GridPane();
 
-
-public class Main extends Application { static GridPane grid = new GridPane();
 
 @Override public void start(Stage primaryStage) {
 	try {
+	    primaryStage.setTitle("Critters!");
+		grid.setGridLinesVisible(false);
+		grid.setHgap(10); //horizontal gap in pixels => that's what you are asking for
+		grid.setVgap(10); //vertical gap in pixels
+		// Paints the icons. 
+		//Painter.paint();
+		final FlowPane flow_buttons = new FlowPane();
+		final FlowPane flow_stats = new FlowPane();
+		final Canvas canvas = new Canvas(assignment5.Params.world_width,assignment5.Params.world_height);
+		final GridPane canvas_grid = new GridPane();
+
+		// button layout
+	    flow_buttons.setMaxWidth(140);
+		flow_buttons.setHgap(10);
+		flow_buttons.setVgap(10);
+		Button btn = new Button();
+	    Button btn1 = new Button();
+	    flow_buttons.getChildren().add(btn);
+	    flow_buttons.getChildren().add(btn1);
+	    btn.setText("Add new Critter");
+	    btn1.setText("yooooo");
+	    btn.setOnAction(new EventHandler<ActionEvent>() {
+	        @Override
+	        public void handle(ActionEvent event) {
+	            System.out.println("You have created a new Crit!");
+	        }
+	    });
+
+	    //canvas layout
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.setFill(Color.BLUE);
+		gc.fillRect(0,0,assignment5.Params.world_width,assignment5.Params.world_height);
 		
-		//The BorderPane has the same areas laid out as the
-		//BorderLayout layout manager
-		BorderPane componentLayout = new BorderPane();
-		componentLayout.setPadding(new Insets(20,0,20,20));
+	    //stats layout
+	    Label label = new Label("helloooooooooooooooooooooooooooooooo00000000000000000000000000000000000000000000");
+	    label.setMaxWidth(140 + 10 + assignment5.Params.world_width);
+	    // TODO add a scroll wrap if surpasses stats max height
+	    label.setWrapText(true);
+	    flow_stats.getChildren().add(label);
 
-		//The FlowPane is a conatiner that uses a flow layout
-		final FlowPane choicePane = new FlowPane();
-		choicePane.setHgap(100);
-		Label choiceLbl = new Label("Fruits");
+	   
+		// adding subcontainers into top grid container
+	    grid.add(flow_buttons, 0, 0 ,1, 1);  // col index, row index, col span, row span
+	    grid.add(canvas, 1, 0 ,1, 1);
+	    grid.add(flow_stats, 0, 1 ,2, 1);
 
-		//The choicebox is populated from an observableArrayList
-		ChoiceBox fruits = new ChoiceBox(FXCollections.observableArrayList("Asparagus", "Beans", "Broccoli", "Cabbage"
-		, "Carrot", "Celery", "Cucumber", "Leek", "Mushroom"
-		, "Pepper", "Radish", "Shallot", "Spinach", "Swede"
-		, "Turnip"));
-		
-		choicePane.getChildren().add(choiceLbl);
-		choicePane.getChildren().add(fruits);
-		
-		//put the flowpane in the top area of the BorderPane
-		componentLayout.setTop(choicePane);
-
-		final FlowPane listPane = new FlowPane();
-		listPane.setHgap(100);
-		Label listLbl = new Label("Vegetables");
-
-		ListView vegetables = new ListView(FXCollections.observableArrayList("Apple", "Apricot", "Banana"
-		,"Cherry", "Date", "Kiwi", "Orange", "Pear", "Strawberry"));
-		listPane.getChildren().add(listLbl);
-		listPane.getChildren().add(vegetables);
-		listPane.setVisible(false);
-
-		componentLayout.setCenter(listPane);
-
-		//The button uses an inner class to handle the button click event
-		Button vegFruitBut = new Button("Fruit or Veg");
-		vegFruitBut.setOnAction(new EventHandler<ActionEvent>() {
-
-		@Override
-		public void handle(ActionEvent event) {
-		//switch the visibility for each FlowPane
-		choicePane.setVisible(!choicePane.isVisible());
-		listPane.setVisible(!listPane.isVisible());
-		}
-		});
-
-		componentLayout.setBottom(vegFruitBut);
-
-		//Add the BorderPane to the Scene
-		Scene appScene = new Scene(componentLayout,500,500);
-
-		//Add the Scene to the Stage
-		primaryStage.setScene(appScene);
-		/*
-		grid.setGridLinesVisible(true);
-		Scene scene = new Scene(componentLayout,500,500); primaryStage.setScene(scene);
-		*/
-		primaryStage.show();
-		// Paints the icons. Painter.paint();
+	    // show the good stuff
+		Scene scene = new Scene(grid, assignment5.Params.world_width + 200, assignment5.Params.world_height + 200);
+	    primaryStage.setScene(scene);
+	    primaryStage.show();
+	    
 	} catch(Exception e) { e.printStackTrace(); }
 }
+	
 
 public static void main(String[] args) {
 	
