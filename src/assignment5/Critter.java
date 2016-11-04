@@ -13,8 +13,12 @@
 package assignment5;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.naming.directory.DirContext;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,6 +36,7 @@ import javafx.stage.Stage;
 public abstract class Critter {
 	private static String myPackage;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
+	private	static List<Critter> oldPopulation = new java.util.ArrayList<Critter>();	// population before walking
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
 	private boolean haveMoved;	// indicates if critter has walked/run for a current timestep
 	private boolean inFight;
@@ -67,8 +72,38 @@ public abstract class Critter {
 	
 	public abstract CritterShape viewShape(); 
 	
-	protected String look(int direction, boolean steps) {return "";}
+	protected String look(int direction, boolean steps) {
+		int stepNum=1;
+		int xToCheck = x_coord;
+		int yToCheck = y_coord;
+		if(steps == true)	
+			stepNum=2;	// if critter is running, step number is 2
+		if (direction == 0 || direction == 1 || direction == 7)
+			xToCheck++;
+		if (direction == 3 || direction == 4 || direction == 5)
+			xToCheck--;
+		if (direction == 5 || direction == 6 || direction == 7)
+			yToCheck++;
+		if (direction == 1 || direction == 2 || direction == 3)
+			yToCheck--;
+		energy -= Params.look_energy_cost; 
+		return isFreeLook(xToCheck, yToCheck, this);
+	}
 	
+	/**
+	 * @param x
+	 * @param y
+	 * @param calling
+	 * @returns the toString of the critter that occupies the place, based on oldPopulation
+	 */
+	private static String isFreeLook (int x,  int y, Critter calling){
+		for(Critter c : oldPopulation){
+			if((c.x_coord==x) && (c.y_coord==y) && c!=calling){ // means someone is already there
+				return c.toString();
+			}
+		}
+		return ""; // spot is empty
+	}
 	
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -416,13 +451,13 @@ public abstract class Critter {
 	 * Clear the world of all critters, dead and alive
 	 */
 	public static void clearWorld() {
-		population = new java.util.ArrayList<Critter>(); // is that fine or need to delete old object?
+		population = new java.util.ArrayList<Critter>(); 
 		World.clearMap();
 	}
 	
 	public static void worldTimeStep()  {
-		//move babies to grown ups list
-		population.addAll(babies);
+		oldPopulation = new ArrayList<Critter>(population);	// old population is the pop before walking, used in look method
+		population.addAll(babies); //move babies to grown ups list
 		babies.clear();
 		for (Critter c: population){	
 			c.inFight = false;
@@ -441,7 +476,6 @@ public abstract class Critter {
 			}catch(Exception e){
 				System.out.println("nothing");
 			}
-
 		}
 	}
 	
@@ -547,5 +581,4 @@ public abstract class Critter {
 		}
 		World.displayMap();
 	}
-	
 }
