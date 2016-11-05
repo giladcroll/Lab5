@@ -79,13 +79,13 @@ public abstract class Critter {
 		if(steps == true)	
 			stepNum=2;	// if critter is running, step number is 2
 		if (direction == 0 || direction == 1 || direction == 7)
-			xToCheck++;
+			incrementCoord(xToCheck,Params.world_width);
 		if (direction == 3 || direction == 4 || direction == 5)
-			xToCheck--;
+			decrementCoord(xToCheck,Params.world_width);
 		if (direction == 5 || direction == 6 || direction == 7)
-			yToCheck++;
+			incrementCoord(yToCheck,Params.world_height);
 		if (direction == 1 || direction == 2 || direction == 3)
-			yToCheck--;
+			decrementCoord(yToCheck,Params.world_height);
 		energy -= Params.look_energy_cost; 
 		return isFreeLook(xToCheck, yToCheck, this);
 	}
@@ -572,6 +572,14 @@ public abstract class Critter {
 	}
 	
 	public static void displayWorld() {
+		Main.grid.getChildren().clear(); // clean up grid.
+		for (Critter c: population){	
+			int x= c.x_coord;
+			int y= c.y_coord;
+			Painter.paint(c.toString(), x, y);
+		}
+		World.displayMap();
+		
 		World.clearMap();
 		for (Critter c: population){	
 			int x= c.x_coord;
@@ -580,5 +588,7 @@ public abstract class Critter {
 			World.map[y][x] = c.toString(); // maybe?
 		}
 		World.displayMap();
+		
+		
 	}
 }
