@@ -1,8 +1,14 @@
 package assignment5;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.Painter;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -30,9 +36,12 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 public class Main extends Application { 
 	
+	final static int canvasWitdh = 500;
+	final static int canvasHight = canvasWitdh/2;
 	static GridPane grid = new GridPane();
-
-
+	static Canvas canvas = new Canvas(canvasWitdh,canvasHight);
+	static int cell = canvasWitdh/Params.world_width;
+	
 @Override public void start(Stage primaryStage) {
 	try {
 		final GridPane stageGrid = new GridPane();
@@ -44,13 +53,24 @@ public class Main extends Application {
 		//Painter.paint();
 		final VBox buttons = new VBox();
 		final FlowPane flow_stats = new FlowPane();
-		final int worldSize = 500;
-		final Canvas canvas = new Canvas(worldSize,worldSize/2);
-	
+		//grid.setMinWidth(1000);
+		for (int i=0; i < Params.world_width;i++){
+			grid.getColumnConstraints().add(new ColumnConstraints(cell)); 		     
+		}
+		for (int i=0; i < Params.world_width;i++){
+			grid.getRowConstraints().add(new RowConstraints(cell)); 		     
+		}
+
+		//final Canvas canvas = new Canvas(canvasWitdh,canvasHight);
+		grid.setHgap(Params.world_width);
+		grid.setHgap(Params.world_height);
+		StackPane world = new StackPane();
+		world.getChildren().addAll(canvas,grid);
+		
 	    // Buttons
 		// makeCritter
 		ArrayList<String> critters = returnCritters();
-		ComboBox critterList = new ComboBox(FXCollections.observableArrayList(critters));
+		ComboBox<String> critterList = new ComboBox(FXCollections.observableArrayList(critters));
 		critterList.setPromptText("Select Critter");
 		TextField numOfCrt = new TextField ();
 		numOfCrt.setPromptText("number of Critters");
@@ -65,7 +85,7 @@ public class Main extends Application {
 	    });
 		Label errLbl = new Label("");
 		errLbl.setTextFill(Color.RED);
-		Button makeCrt= new Button("Make Critter");
+		Button makeCrt= new Button("make critter");
 		makeCrt.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		makeCrt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -130,31 +150,80 @@ public class Main extends Application {
 		FlowPane flowStep = new FlowPane((Orientation.HORIZONTAL));
 		flowStep.getChildren().add(stepBtn);
 		flowStep.getChildren().add(numOfSteps);
-	
+		
+		// run stats button
+		ComboBox critterListStats = new ComboBox(FXCollections.observableArrayList(critters));	//critter selection list for run stats
+		critterListStats.setPromptText("Select Critter");
+		
+		Button statsBtn = new Button("run stats");
+		statsBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		Label statsLabel = new Label("helloooooooooooooooooooooooooooooooo00000000000000000000000000000000000000000000");
+		statsBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	if (critterListStats.getValue() != null){
+            		try {
+            			String myPackage = Critter.class.getPackage().toString().split(" ")[1];
+            			Class<?> cls = Class.forName(myPackage+"."+(String)critterListStats.getValue());
+            			Method method = cls.getMethod("runStats", List.class);
+	         			method.invoke(null ,Critter.getInstances((String)critterListStats.getValue()));
+            			//Critter.runStats(Critter.getInstances((String)critterListStats.getValue()));
+            		} catch (Exception e) {}
+            	} else
+					try {
+						Critter.runStats(Critter.getInstances("Critter"));
+					} catch (InvalidCritterException e) {}
+            	//statsLabel.setText(Critter.runStats(Critter.getInstances("Critter")));
+            	
+            }
+        });
+		
+		//quit Button
+		Button quitBtn = new Button("quit");
+		quitBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	System.exit(0);
+            }
+        });
+		
+		// run stats button layout
+		FlowPane flowStats = new FlowPane((Orientation.HORIZONTAL));
+		flowStats.getChildren().add(statsBtn);
+		flowStats.getChildren().add(critterListStats);
+		//flowStats.getChildren().add();
+		
 	    // add buttons into container
 	    buttons.getChildren().add(flowMakeCrit);
 	    buttons.getChildren().add(errLbl);
 	    buttons.getChildren().add(flowStep);
-	    
+	    buttons.getChildren().add(new Label());
+	    buttons.getChildren().add(flowStats);
+	    buttons.getChildren().add(new Label());
+	    buttons.getChildren().add(quitBtn);
 	    //canvas layout
 		GraphicsContext gc = canvas.getGraphicsContext2D();
-		gc.setFill(Color.BLUE);
-		gc.fillRect(0,0,worldSize,worldSize/2);
+		gc.setFill(Color.AQUA);
+		gc.fillRect(0,0,canvasWitdh,canvasHight);
+		
+		//test canvas cell fill
+		gc.setStroke(Color.BLACK);
+	    gc.setFill(Color.RED);
+		gc.fillRect(0, 0, cell, cell);
 		
 	    //stats layout
-	    Label label = new Label("helloooooooooooooooooooooooooooooooo00000000000000000000000000000000000000000000");
-	    label.setMaxWidth(140 + 10 + assignment5.Params.world_width);
+	    statsLabel.setMaxWidth(140 + 10 + assignment5.Params.world_width);
 	    // TODO add a scroll wrap if surpasses stats max height
-	    label.setWrapText(true);
-	    flow_stats.getChildren().add(label);
+	    statsLabel.setWrapText(true);
+	    flow_stats.getChildren().add(statsLabel);
 
 		// adding subcontainers into top grid container
 	    stageGrid.add(buttons, 0, 0 ,1, 1);  // col index, row index, col span, row span
-	    stageGrid.add(canvas, 1, 0 ,1, 1);
+	    stageGrid.add(world, 1, 0 ,1, 1);
 	    stageGrid.add(flow_stats, 0, 1 ,2, 1);
 
 	    // show the good stuff
-		Scene scene = new Scene(stageGrid, worldSize + 500, worldSize/2 + 200);
+		Scene scene = new Scene(stageGrid, canvasWitdh + 700, canvasHight + 400);
 	    primaryStage.setScene(scene);
 	    primaryStage.show();
 	} catch(Exception e) { e.printStackTrace(); }
@@ -169,30 +238,33 @@ public static void main(String[] args) {
  * returns all childs of critter in a string list 
  * @param Files
  */
-private static ArrayList<String> returnCritters(){
-	String myPackage;
-	myPackage = Critter.class.getPackage().toString().split(" ")[1];
-	File folder = new File(System.getProperty("user.dir") + "/src/" + myPackage );
-	File[] files= folder.listFiles();
-	ArrayList<String> critterList = new ArrayList<String> ();
-	for (int i = 0; i < files.length; i++) {
-	      if (files[i].isFile()) {
-	        String file = files[i].getName();
-	        if (file.length() >4){
-	        	if (file.substring(file.length() - 4, file.length()).equals(".java"));{
-	        		String className =file.substring(0 , file.length() - 5);
-	        		Class<?> cls;
-					try {
-						cls = Class.forName(myPackage+"."+className);
-						if (!Modifier.isAbstract(cls.getModifiers()) && (Critter.class.isAssignableFrom(cls))){
-		         			critterList.add(className);
-						}
-					} catch (Exception e) {}	// gets the class from string
-	         			
-	        	}
-	        }
-	      }
-	    }
-	return critterList;
+	private static ArrayList<String> returnCritters(){
+		String myPackage;
+		myPackage = Critter.class.getPackage().toString().split(" ")[1];
+		File folder = new File(System.getProperty("user.dir") + "/src/" + myPackage );
+		File[] files= folder.listFiles();
+		ArrayList<String> critterList = new ArrayList<String> ();
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isFile()) {
+				String file = files[i].getName();
+				if (file.length() >4){
+					if (file.substring(file.length() - 4, file.length()).equals(".java"));{
+						String className =file.substring(0 , file.length() - 5);
+						Class<?> cls;
+						try {
+							cls = Class.forName(myPackage+"."+className);
+							if (!Modifier.isAbstract(cls.getModifiers()) && (Critter.class.isAssignableFrom(cls))){
+								critterList.add(className);
+							}
+						} catch (Exception e) {}	// gets the class from string
+	
+					}
+				}
+			}
+		}
+		return critterList;
+	}
+			
 }
-}
+
+
