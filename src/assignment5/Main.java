@@ -38,14 +38,13 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 public class Main extends Application { 
 	
-	final static int worldWidth = 700;
-	final static int worldHight = worldWidth*2/3;
+	final static int worldWidth = 800;
 	static GridPane grid = new GridPane();	// grid for show world
 	//static Canvas canvas = new Canvas(canvasWitdh,canvasHight);	// canvas for show world
 	static int cell = worldWidth/Params.world_width;
 	static {	// set cell to proper value
-		if (Params.world_height>Params.world_width*2/3)
-			cell = worldHight/Params.world_height;
+		if (Params.world_height*2/3>Params.world_width)
+			cell = worldWidth*2/3/Params.world_height;
 	}
 	// to redirect console:
 	static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
