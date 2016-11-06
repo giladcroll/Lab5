@@ -578,17 +578,5 @@ public abstract class Critter {
 			int y= c.y_coord;
 			Painter.paint(c.toString(), x, y);
 		}
-		World.displayMap();
-		
-		World.clearMap();
-		for (Critter c: population){	
-			int x= c.x_coord;
-			int y= c.y_coord;
-			// map is set as [height][width], for some reason
-			World.map[y][x] = c.toString(); // maybe?
-		}
-		World.displayMap();
-		
-		
 	}
 }
