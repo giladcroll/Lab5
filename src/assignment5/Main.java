@@ -1,7 +1,9 @@
 package assignment5;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -38,9 +40,12 @@ public class Main extends Application {
 	
 	final static int canvasWitdh = 500;
 	final static int canvasHight = canvasWitdh/2;
-	static GridPane grid = new GridPane();
-	static Canvas canvas = new Canvas(canvasWitdh,canvasHight);
+	static GridPane grid = new GridPane();	// grid for show world
+	static Canvas canvas = new Canvas(canvasWitdh,canvasHight);	// canvas for show world
 	static int cell = canvasWitdh/Params.world_width;
+	// to redirect console:
+	static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
+	static PrintStream old = System.out;	// if you want to restore output to console
 	
 @Override public void start(Stage primaryStage) {
 	try {
@@ -157,7 +162,7 @@ public class Main extends Application {
 		
 		Button statsBtn = new Button("run stats");
 		statsBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
-		Label statsLabel = new Label("helloooooooooooooooooooooooooooooooo00000000000000000000000000000000000000000000");
+		Label statsLabel = new Label("Welcome to Critters");
 		statsBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -167,11 +172,15 @@ public class Main extends Application {
             			Class<?> cls = Class.forName(myPackage+"."+(String)critterListStats.getValue());
             			Method method = cls.getMethod("runStats", List.class);
 	         			method.invoke(null ,Critter.getInstances((String)critterListStats.getValue()));
+	         			statsLabel.setText(testOutputString.toString());
+	         			testOutputString.reset();
             			//Critter.runStats(Critter.getInstances((String)critterListStats.getValue()));
             		} catch (Exception e) {}
             	} else
 					try {
 						Critter.runStats(Critter.getInstances("Critter"));
+						statsLabel.setText(testOutputString.toString());
+	         			testOutputString.reset();
 					} catch (InvalidCritterException e) {}
             	//statsLabel.setText(Critter.runStats(Critter.getInstances("Critter")));
             	
@@ -231,6 +240,16 @@ public class Main extends Application {
 	
 
 public static void main(String[] args) {
+	// redirect console
+	
+	testOutputString = new ByteArrayOutputStream();
+	PrintStream ps = new PrintStream(testOutputString);
+	// Save the old System.out.
+	old = System.out;
+	// Tell Java to use the special stream; all console output will be redirected here from now
+	System.setOut(ps);
+	// 
+	
 	launch(args);
 }
 
@@ -266,5 +285,3 @@ public static void main(String[] args) {
 	}
 			
 }
-
-
