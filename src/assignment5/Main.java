@@ -62,12 +62,12 @@ public class Main extends Application {
 	// to redirect console:
 	static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
 	static PrintStream old = System.out;	// if you want to restore output to console
-	Timeline animationTL ;
-	List<Button> buttonList = new ArrayList<Button>();
-	int animationSpeed=1;
+	static Timeline animationTL ;
+	static Integer animationSpeed=1;
 	
 @Override public void start(Stage primaryStage) {
 	try {
+		List<Button> buttonList = new ArrayList<Button>();
 		final GridPane stageGrid = new GridPane();
 	    primaryStage.setTitle("Critters!");
 	    stageGrid.setGridLinesVisible(false);
@@ -110,20 +110,7 @@ public class Main extends Application {
 		makeCrt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	if((critterList.getValue() != null) && !(numOfCrt.getText().equals("")) ){
-            		errLbl.setText("");
-            		for (int i=0; i< Integer.valueOf(numOfCrt.getText()); i++)
-            			try {
-            				Critter.makeCritter((String)critterList.getValue());
-            			} catch (InvalidCritterException e) {}
-            		// clear selection in critter number and in critter selection
-            		numOfCrt.clear();
-            		critterList.getSelectionModel().clearSelection();
-            		Critter.displayWorld();
-            	}
-            	else{
-            		errLbl.setText("Make sure to select a Critter and enter a number");
-            	}
+            	makeCritterJFX(critterList, numOfCrt, errLbl);
             }
         });
 		// make critter Button layout
@@ -182,24 +169,7 @@ public class Main extends Application {
 		statsBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	if (critterListStats.getValue() != null){
-            		try {
-            			String myPackage = Critter.class.getPackage().toString().split(" ")[1];
-            			Class<?> cls = Class.forName(myPackage+"."+(String)critterListStats.getValue());
-            			Method method = cls.getMethod("runStats", List.class);
-	         			method.invoke(null ,Critter.getInstances((String)critterListStats.getValue()));
-	         			statsLabel.setText(testOutputString.toString());
-	         			testOutputString.reset();
-            			//Critter.runStats(Critter.getInstances((String)critterListStats.getValue()));
-            		} catch (Exception e) {}
-            	} else
-					try {
-						Critter.runStats(Critter.getInstances("Critter"));
-						statsLabel.setText(testOutputString.toString());
-	         			testOutputString.reset();
-					} catch (InvalidCritterException e) {}
-            	//statsLabel.setText(Critter.runStats(Critter.getInstances("Critter")));
-            	
+            	Main.showStats(statsLabel, critterListStats);
             }
         });
 		
@@ -226,30 +196,7 @@ public class Main extends Application {
 		animateBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {            	 
-            	animationTL = new Timeline(new KeyFrame(Duration.seconds(0.5), new EventHandler<ActionEvent>() {
-            	    @Override
-            	    public void handle(ActionEvent event) {
-            	    	for (Button butt: buttonList){
-            	    		butt.setDisable(true);
-            	    	}
-            	    	for (int i=0; i<animationSpeed; i++){
-            	    		Critter.worldTimeStep();}
-            	    	Critter.displayWorld();
-            	    	// run stats for critter
-            	    	try {
-            	    		Critter.runStats(Critter.getInstances("Critter"));
-            	    	} catch (InvalidCritterException e) {
-            	    		// TODO Auto-generated catch block
-            	    		e.printStackTrace();
-            	    	}
-            	    	statsLabel.setText(testOutputString.toString());
-            	    	testOutputString.reset();
-            	    	animateBtn.setDisable(true);
-            	    }
-            	}));
-            	animationTL.setCycleCount(Timeline.INDEFINITE);
-            	animationTL.play(); 
-
+            	Main.animate(buttonList, statsLabel, critterListStats, animateBtn);
             }
 		});
 
@@ -258,7 +205,7 @@ public class Main extends Application {
 		stopAnimateBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	animationTL.stop(); 
+            	Main.animationTL.stop(); 
             	for (Button butt: buttonList){
     	    		butt.setDisable(false);
     	    	}
@@ -394,7 +341,61 @@ public static void main(String[] args) {
 		}
 		return critterList;
 	}
-			
+	static void showStats(Label statsLabel, ComboBox critterListStats)	{
+		if (critterListStats.getValue() != null){
+			try {
+				String myPackage = Critter.class.getPackage().toString().split(" ")[1];
+				Class<?> cls = Class.forName(myPackage+"."+(String)critterListStats.getValue());
+				Method method = cls.getMethod("runStats", List.class);
+				method.invoke(null ,Critter.getInstances((String)critterListStats.getValue()));
+				statsLabel.setText(testOutputString.toString());
+				testOutputString.reset();
+				//Critter.runStats(Critter.getInstances((String)critterListStats.getValue()));
+			} catch (Exception e) {}
+		} else
+			try {
+				Critter.runStats(Critter.getInstances("Critter"));
+				statsLabel.setText(testOutputString.toString());
+				testOutputString.reset();
+			} catch (InvalidCritterException e) {}
+	}
+	static void makeCritterJFX (ComboBox critterList, TextField numOfCrt, Label errLbl){
+		if((critterList.getValue() != null) && !(numOfCrt.getText().equals("")) ){
+    		errLbl.setText("");
+    		for (int i=0; i< Integer.valueOf(numOfCrt.getText()); i++)
+    			try {
+    				Critter.makeCritter((String)critterList.getValue());
+    			} catch (InvalidCritterException e) {}
+    		// clear selection in critter number and in critter selection
+    		numOfCrt.clear();
+    		critterList.getSelectionModel().clearSelection();
+    		Critter.displayWorld();
+    	}
+    	else{
+    		errLbl.setText("Make sure to select a Critter and enter a number");
+    	}
+	}
+
+	static void animate(List<Button> buttonList, Label statsLabel, ComboBox critterListStats, Button animateBtn){
+		animationTL = new Timeline(new KeyFrame(Duration.seconds(0.5), new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				for (Button butt: buttonList){
+					butt.setDisable(true);
+				}
+				for (int i=0; i<animationSpeed; i++){
+					Critter.worldTimeStep();}
+				Critter.displayWorld();
+				// run stats for critter
+				Main.showStats(statsLabel, critterListStats);
+				animateBtn.setDisable(true);
+			}
+		}));
+		animationTL.setCycleCount(Timeline.INDEFINITE);
+		animationTL.play(); 
+
+	}
+
 }
 
 
