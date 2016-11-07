@@ -8,9 +8,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.Painter;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -24,6 +27,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -36,6 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 public class Main extends Application { 
 	
 	final static int worldWidth = 800;
@@ -46,6 +51,7 @@ public class Main extends Application {
 		if (Params.world_height*2/3>Params.world_width)
 			cell = worldWidth*2/3/Params.world_height;
 	}
+	boolean animate = false;
 	// to redirect console:
 	static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
 	static PrintStream old = System.out;	// if you want to restore output to console
@@ -54,7 +60,7 @@ public class Main extends Application {
 	try {
 		final GridPane stageGrid = new GridPane();
 	    primaryStage.setTitle("Critters!");
-	    stageGrid.setGridLinesVisible(true);
+	    stageGrid.setGridLinesVisible(false);
 	    stageGrid.setHgap(10); //horizontal gap in pixels 
 	    stageGrid.setVgap(10); //vertical gap in pixels
 		final VBox buttons = new VBox();
@@ -186,6 +192,7 @@ public class Main extends Application {
 		
 		//quit Button
 		Button quitBtn = new Button("quit");
+		quitBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		quitBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -199,6 +206,51 @@ public class Main extends Application {
 		flowStats.getChildren().add(critterListStats);
 		//flowStats.getChildren().add();
 		
+		// Animation
+		
+		Button animateBtn = new Button("animate");
+		animateBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		animateBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	animate = true;
+            	System.out.println("check1");
+            	statsLabel.setText(testOutputString.toString());
+            	//testOutputString.reset();
+            	Duration.seconds(5);
+            	System.out.println("check2");
+            	statsLabel.setText(testOutputString.toString());
+            	testOutputString.reset();
+            	
+//            	while(animate){
+//            		//long startTime = System.nanoTime();
+//            		//while (System.nanoTime()< startTime+2000000000){}
+//            		for (long i=0 ; i<10000000;i++){i=i;}
+//            		
+//            	}
+            	  AnimationTimer timer = new AnimationTimer() {
+                      @Override
+                      public void handle(long now) {
+                    	  Critter.worldTimeStep();
+                    	  Critter.displayWorld();
+                      }
+                  };
+            	
+            }
+        });
+		
+		Slider slider = new Slider();
+		
+		slider.valueProperty().addListener((obs, oldval, newVal) -> slider.setValue(newVal.intValue())); // make it discrete values
+		slider.setMin(0);
+		slider.setMax(50);
+		slider.setValue(25);
+		slider.setShowTickLabels(true);
+		slider.setShowTickMarks(true);
+		slider.setMajorTickUnit(10);
+		slider.setMinorTickCount(5);
+		slider.setBlockIncrement(10);
+		
 	    // add buttons into container
 	    buttons.getChildren().add(flowMakeCrit);
 	    buttons.getChildren().add(errLbl);
@@ -206,7 +258,12 @@ public class Main extends Application {
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(flowStats);
 	    buttons.getChildren().add(new Label());
+	    buttons.getChildren().add(animateBtn);
+	    buttons.getChildren().add(new Label("animation speed:"));
+	    buttons.getChildren().add(slider);
+	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(quitBtn);
+	    
 /*	    //canvas layout
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.setFill(Color.AQUA);
@@ -218,28 +275,30 @@ public class Main extends Application {
 		gc.fillRect(0, 0, cell, cell);
 */		
 	    //stats layout
+	    
 	    statsLabel.setMaxWidth(140 + 10 + assignment5.Params.world_width);
 	    // TODO add a scroll wrap if surpasses stats max height
 	    statsLabel.setWrapText(true);
 	    flow_stats.getChildren().add(statsLabel);
+	    
 
 		// adding subcontainers into top grid container
-	    stageGrid.add(buttons, 0, 0 ,1, 1);  // col index, row index, col span, row span
-	    stageGrid.add(grid, 1, 0 ,1, 1);
-	    stageGrid.add(flow_stats, 0, 1 ,2, 1);
+	    stageGrid.add(buttons, 1, 1 ,1, 1);  // col index, row index, col span, row span
+	    stageGrid.add(grid, 2, 1 ,1, 1);
+	    stageGrid.add(flow_stats, 1, 2 ,2, 1);
 
 	    // show the good stuff
 		//Scene scene = new Scene(stageGrid, worldWidth + 500, worldHight + 400);
-	    int stageHight = cell*Params.world_height ;
-	    if (stageHight < 300)
-	    	stageHight = 300;
+	    int gridWorldHight = cell*Params.world_height ;
+	    if (gridWorldHight < 300)	// make sure that grade for world is not too small
+	    	gridWorldHight = 300;
+	    stageGrid.getColumnConstraints().add(new ColumnConstraints(10));
 	    stageGrid.getColumnConstraints().add(new ColumnConstraints(400));
-	    stageGrid.getColumnConstraints().add(new ColumnConstraints(worldWidth));
-	    stageGrid.getRowConstraints().add(new RowConstraints(stageHight));
+	    stageGrid.getColumnConstraints().add(new ColumnConstraints(worldWidth + 10));
+	    stageGrid.getRowConstraints().add(new RowConstraints(10));
+	    stageGrid.getRowConstraints().add(new RowConstraints(gridWorldHight));
 	    stageGrid.getRowConstraints().add(new RowConstraints(100));
-	    
 	    Scene scene = new Scene(stageGrid);
-	    
 	    primaryStage.setScene(scene);
 	    primaryStage.show();
 	} catch(Exception e) { e.printStackTrace(); }
