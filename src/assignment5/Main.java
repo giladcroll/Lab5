@@ -10,10 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import static java.util.concurrent.TimeUnit.*;
 import javax.swing.Painter;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -55,6 +60,8 @@ public class Main extends Application {
 	// to redirect console:
 	static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
 	static PrintStream old = System.out;	// if you want to restore output to console
+	Timeline animationTL ;
+	List<Button> buttonList = new ArrayList<Button>();
 	
 @Override public void start(Stage primaryStage) {
 	try {
@@ -95,6 +102,7 @@ public class Main extends Application {
 		Label errLbl = new Label("");
 		errLbl.setTextFill(Color.RED);
 		Button makeCrt= new Button("make critter");
+		buttonList.add(makeCrt);
 		makeCrt.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		makeCrt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -135,6 +143,7 @@ public class Main extends Application {
 			    });
 		
 		Button stepBtn = new Button("step");
+		buttonList.add(stepBtn);
 		stepBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		stepBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -164,6 +173,7 @@ public class Main extends Application {
 		ComboBox critterListStats = new ComboBox(FXCollections.observableArrayList(critters));	//critter selection list for run stats
 		critterListStats.setPromptText("Select Critter");
 		Button statsBtn = new Button("run stats");
+		buttonList.add(statsBtn);
 		statsBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		Label statsLabel = new Label("Welcome to Critters");
 		statsBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -212,30 +222,43 @@ public class Main extends Application {
 		animateBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		animateBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
+            public void handle(ActionEvent event) {            	 
+            	animationTL = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+            	    @Override
+            	    public void handle(ActionEvent event) {
+            	    	for (Button butt: buttonList){
+            	    		butt.setDisable(true);
+            	    	}
+            	    	Critter.worldTimeStep();
+            	    	Critter.displayWorld();
+            	    	// run stats for critter
+            	    	try {
+            	    		Critter.runStats(Critter.getInstances("Critter"));
+            	    	} catch (InvalidCritterException e) {
+            	    		// TODO Auto-generated catch block
+            	    		e.printStackTrace();
+            	    	}
+            	    	statsLabel.setText(testOutputString.toString());
+            	    	testOutputString.reset();
+            	    	animateBtn.setDisable(true);
+            	    }
+            	}));
+            	animationTL.setCycleCount(Timeline.INDEFINITE);
+            	animationTL.play(); 
+
+            }
+		});
+
+		Button stopAnimateBtn = new Button("stop");
+		stopAnimateBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		stopAnimateBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
             public void handle(ActionEvent event) {
-            	animate = true;
-            	System.out.println("check1");
-            	statsLabel.setText(testOutputString.toString());
-            	//testOutputString.reset();
-            	Duration.seconds(5);
-            	System.out.println("check2");
-            	statsLabel.setText(testOutputString.toString());
-            	testOutputString.reset();
-            	
-//            	while(animate){
-//            		//long startTime = System.nanoTime();
-//            		//while (System.nanoTime()< startTime+2000000000){}
-//            		for (long i=0 ; i<10000000;i++){i=i;}
-//            		
-//            	}
-            	  AnimationTimer timer = new AnimationTimer() {
-                      @Override
-                      public void handle(long now) {
-                    	  Critter.worldTimeStep();
-                    	  Critter.displayWorld();
-                      }
-                  };
-            	
+            	animationTL.stop(); 
+            	for (Button butt: buttonList){
+    	    		butt.setDisable(false);
+    	    	}
+               	animateBtn.setDisable(false);
             }
         });
 		
@@ -259,22 +282,11 @@ public class Main extends Application {
 	    buttons.getChildren().add(flowStats);
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(animateBtn);
+	    buttons.getChildren().add(stopAnimateBtn);
 	    buttons.getChildren().add(new Label("animation speed:"));
 	    buttons.getChildren().add(slider);
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(quitBtn);
-	    
-/*	    //canvas layout
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		gc.setFill(Color.AQUA);
-		gc.fillRect(0,0,canvasWitdh,canvasHight);
-		
-		//test canvas cell fill
-		gc.setStroke(Color.BLACK);
-	    gc.setFill(Color.RED);
-		gc.fillRect(0, 0, cell, cell);
-*/		
-	    //stats layout
 	    
 	    statsLabel.setMaxWidth(140 + 10 + assignment5.Params.world_width);
 	    // TODO add a scroll wrap if surpasses stats max height
