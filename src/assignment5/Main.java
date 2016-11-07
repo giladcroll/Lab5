@@ -26,6 +26,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -46,6 +47,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import jdk.nashorn.internal.objects.annotations.SpecializedFunction;
 public class Main extends Application { 
 	
 	final static int worldWidth = 800;
@@ -62,6 +64,7 @@ public class Main extends Application {
 	static PrintStream old = System.out;	// if you want to restore output to console
 	Timeline animationTL ;
 	List<Button> buttonList = new ArrayList<Button>();
+	int animationSpeed=1;
 	
 @Override public void start(Stage primaryStage) {
 	try {
@@ -101,7 +104,7 @@ public class Main extends Application {
 	    });
 		Label errLbl = new Label("");
 		errLbl.setTextFill(Color.RED);
-		Button makeCrt= new Button("make critter");
+		Button makeCrt= new Button("Make Critter");
 		buttonList.add(makeCrt);
 		makeCrt.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		makeCrt.setOnAction(new EventHandler<ActionEvent>() {
@@ -142,7 +145,7 @@ public class Main extends Application {
 			        }
 			    });
 		
-		Button stepBtn = new Button("step");
+		Button stepBtn = new Button("Step");
 		buttonList.add(stepBtn);
 		stepBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		stepBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -172,7 +175,7 @@ public class Main extends Application {
 		// run stats button
 		ComboBox critterListStats = new ComboBox(FXCollections.observableArrayList(critters));	//critter selection list for run stats
 		critterListStats.setPromptText("Select Critter");
-		Button statsBtn = new Button("run stats");
+		Button statsBtn = new Button("Run Stats");
 		buttonList.add(statsBtn);
 		statsBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		Label statsLabel = new Label("Welcome to Critters");
@@ -201,7 +204,7 @@ public class Main extends Application {
         });
 		
 		//quit Button
-		Button quitBtn = new Button("quit");
+		Button quitBtn = new Button("Quit");
 		quitBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		quitBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -218,18 +221,19 @@ public class Main extends Application {
 		
 		// Animation
 		
-		Button animateBtn = new Button("animate");
+		Button animateBtn = new Button("Animate");
 		animateBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		animateBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {            	 
-            	animationTL = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+            	animationTL = new Timeline(new KeyFrame(Duration.seconds(0.5), new EventHandler<ActionEvent>() {
             	    @Override
             	    public void handle(ActionEvent event) {
             	    	for (Button butt: buttonList){
             	    		butt.setDisable(true);
             	    	}
-            	    	Critter.worldTimeStep();
+            	    	for (int i=0; i<animationSpeed; i++){
+            	    		Critter.worldTimeStep();}
             	    	Critter.displayWorld();
             	    	// run stats for critter
             	    	try {
@@ -249,7 +253,7 @@ public class Main extends Application {
             }
 		});
 
-		Button stopAnimateBtn = new Button("stop");
+		Button stopAnimateBtn = new Button("Stop");
 		stopAnimateBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
 		stopAnimateBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -262,17 +266,28 @@ public class Main extends Application {
             }
         });
 		
-		Slider slider = new Slider();
+		FlowPane animationFlow = new FlowPane();
+		animationFlow.getChildren().add(animateBtn);
+		animationFlow.getChildren().add(stopAnimateBtn);
 		
+		//Animation Slider
+		Slider slider = new Slider();
 		slider.valueProperty().addListener((obs, oldval, newVal) -> slider.setValue(newVal.intValue())); // make it discrete values
 		slider.setMin(0);
 		slider.setMax(50);
-		slider.setValue(25);
+		slider.setValue(animationSpeed);
 		slider.setShowTickLabels(true);
 		slider.setShowTickMarks(true);
 		slider.setMajorTickUnit(10);
 		slider.setMinorTickCount(5);
 		slider.setBlockIncrement(10);
+		slider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				animationSpeed = newValue.intValue();	// when slider changes, speed changes immediately
+			}
+		});
 		
 	    // add buttons into container
 	    buttons.getChildren().add(flowMakeCrit);
@@ -281,10 +296,12 @@ public class Main extends Application {
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(flowStats);
 	    buttons.getChildren().add(new Label());
-	    buttons.getChildren().add(animateBtn);
-	    buttons.getChildren().add(stopAnimateBtn);
+	    buttons.getChildren().add(animationFlow);
+	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(new Label("animation speed:"));
 	    buttons.getChildren().add(slider);
+	    buttons.getChildren().add(new Label());
+	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(quitBtn);
 	    
@@ -298,17 +315,34 @@ public class Main extends Application {
 	    stageGrid.add(buttons, 1, 1 ,1, 1);  // col index, row index, col span, row span
 	    stageGrid.add(grid, 2, 1 ,1, 1);
 	    stageGrid.add(flow_stats, 1, 2 ,2, 1);
+	    
 
-	    // show the good stuff
+
+	    // set stageGrid, scene and show stage
 		//Scene scene = new Scene(stageGrid, worldWidth + 500, worldHight + 400);
 	    int gridWorldHight = cell*Params.world_height ;
 	    if (gridWorldHight < 300)	// make sure that grade for world is not too small
 	    	gridWorldHight = 300;
+	    
+	    //background for world grid
+	    
+/*	    // Test for frame for world
+	    Canvas canvas = new Canvas(Params.world_width*cell,Params.world_height*cell);
+	    GraphicsContext gc = canvas.getGraphicsContext2D();
+	    gc.setFill(Color.CHARTREUSE);
+	    gc.fillRect(0,0,Params.world_width*cell,Params.world_height*cell);
+	    StackPane canvasPane = new StackPane();
+	    canvasPane.getChildren().add(canvas);
+	    canvasPane.getChildren().add(grid);
+	    stageGrid.add(canvasPane, 2, 1 ,1, 1);
+	    stageGrid.setGridLinesVisible(true); // for debug only
+*/	    
 	    stageGrid.getColumnConstraints().add(new ColumnConstraints(10));
 	    stageGrid.getColumnConstraints().add(new ColumnConstraints(400));
-	    stageGrid.getColumnConstraints().add(new ColumnConstraints(worldWidth + 10));
+	    stageGrid.getColumnConstraints().add(new ColumnConstraints(worldWidth + 50));
+	    
 	    stageGrid.getRowConstraints().add(new RowConstraints(10));
-	    stageGrid.getRowConstraints().add(new RowConstraints(gridWorldHight));
+	    stageGrid.getRowConstraints().add(new RowConstraints(gridWorldHight + 50));
 	    stageGrid.getRowConstraints().add(new RowConstraints(100));
 	    Scene scene = new Scene(stageGrid);
 	    primaryStage.setScene(scene);
