@@ -50,7 +50,7 @@ import javafx.util.Duration;
 import jdk.nashorn.internal.objects.annotations.SpecializedFunction;
 public class Main extends Application { 
 	
-	final static int worldWidth = 800;
+	final static int worldWidth = 500;
 	public static GridPane grid = new GridPane();	// grid for show world
 	//static Canvas canvas = new Canvas(canvasWitdh,canvasHight);	// canvas for show world
 	public static int cell = worldWidth/Params.world_width;
@@ -313,8 +313,7 @@ public static void main(String[] args) {
  * @param Files
  */
 	private static ArrayList<String> returnCritters(){
-		String myPackage;
-		myPackage = Critter.class.getPackage().toString().split(" ")[1];
+		String myPackage = Critter.class.getPackage().toString().split(" ")[1];
 		File folder = new File(System.getProperty("user.dir") + "/src/" + myPackage );
 		File[] files= folder.listFiles();
 		ArrayList<String> critterList = new ArrayList<String> ();

@@ -49,6 +49,7 @@ public abstract class Critter {
 		TRIANGLE,
 		DIAMOND,
 		STAR
+		//String className = this.getClass().getSimpleName();
 	}
 	
 
@@ -335,7 +336,7 @@ public abstract class Critter {
 	
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		try{
-				Class<?> cls = Class.forName(myPackage+"."+critter_class_name);	// gets the class from string
+			Class<?> cls = Class.forName(myPackage+"."+critter_class_name);	// gets the class from string
 			Object newCrit=cls.newInstance();	// instantiate a new critter object
 			population.add((Critter) newCrit);	// add new critter to list
 			//newCrit.setX_coord(getRandomInt(Params.world_width));
@@ -576,7 +577,7 @@ public abstract class Critter {
 		for (Critter c: population){	
 			int x= c.x_coord;
 			int y= c.y_coord;
-			Painter.paint(c.toString(), x, y);
+			Painter.paint(c, x, y);
 		}
 	}
 }
