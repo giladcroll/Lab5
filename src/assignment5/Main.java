@@ -51,19 +51,18 @@ import jdk.nashorn.internal.objects.annotations.SpecializedFunction;
 public class Main extends Application { 
 	
 	final static int worldWidth = 800;
-	static GridPane grid = new GridPane();	// grid for show world
+	public static GridPane grid = new GridPane();	// grid for show world
 	//static Canvas canvas = new Canvas(canvasWitdh,canvasHight);	// canvas for show world
-	static int cell = worldWidth/Params.world_width;
+	public static int cell = worldWidth/Params.world_width;
 	static {	// set cell to proper value
 		if (Params.world_height*2/3>Params.world_width)
 			cell = worldWidth*2/3/Params.world_height;
 	}
-	boolean animate = false;
 	// to redirect console:
-	static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
-	static PrintStream old = System.out;	// if you want to restore output to console
-	static Timeline animationTL ;
-	static Integer animationSpeed=1;
+	private static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
+	private static PrintStream old = System.out;	// if you want to restore output to console
+	private static Timeline animationTL ;
+	private static Integer animationSpeed=1;
 	
 @Override public void start(Stage primaryStage) {
 	try {
@@ -81,8 +80,6 @@ public class Main extends Application {
 		for (int i=0; i < Params.world_height;i++){
 			grid.getRowConstraints().add(new RowConstraints(cell)); 		     
 		}
-
-		//final Canvas canvas = new Canvas(canvasWitdh,canvasHight);
 		grid.setHgap(0);
 		grid.setVgap(0);
 		
@@ -359,7 +356,8 @@ public static void main(String[] args) {
 				testOutputString.reset();
 			} catch (InvalidCritterException e) {}
 	}
-	static void makeCritterJFX (ComboBox critterList, TextField numOfCrt, Label errLbl){
+	
+static void makeCritterJFX (ComboBox critterList, TextField numOfCrt, Label errLbl){
 		if((critterList.getValue() != null) && !(numOfCrt.getText().equals("")) ){
     		errLbl.setText("");
     		for (int i=0; i< Integer.valueOf(numOfCrt.getText()); i++)
