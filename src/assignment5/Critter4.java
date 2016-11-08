@@ -1,3 +1,14 @@
+/* CRITTERS Critter4.java
+ * EE422C Project 5 submission by
+ * Gilad Croll
+ * gc24654
+ * 16445
+ * Alejandro Stevenson-Duran
+ * as72948
+ * 16455
+ * Slip days used: <0>
+ * Fall 2016
+ */
 package assignment5;
 
 import assignment5.Critter.CritterShape;
