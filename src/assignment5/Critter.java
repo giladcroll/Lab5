@@ -103,7 +103,7 @@ public abstract class Critter {
 				return c.toString();
 			}
 		}
-		return ""; // spot is empty
+		return null; // spot is empty
 	}
 	
 	static {
@@ -467,8 +467,7 @@ public abstract class Critter {
 			c.energy -= Params.rest_energy_cost;	// take energy off for resting
 		}
 		clearDead();	// clear all critters with not energy
-		// make them eat algae TODO
-		// reproduce algae TODO
+		oldPopulation = population;
 		resolveEncounters();	//resolves all encounters
 		//add algaes
 		for(int i = 0; i < Params.refresh_algae_count; i++){

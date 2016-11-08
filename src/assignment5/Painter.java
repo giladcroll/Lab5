@@ -26,25 +26,6 @@ import javafx.scene.shape.Shape;
 
 public class Painter {
 
-	/*
-	 * Returns a square or a circle, according to shapeIndex
-	 */
-	static Shape getIcon(int shapeIndex) {
-		Shape s = null;
-		int size = Main.cell;
-		
-		switch(shapeIndex) {
-		case 0: s = new Rectangle(size, size); 
-			s.setFill(javafx.scene.paint.Color.RED); break;
-			 
-		case 1: s = new Circle(size/2); 
-			s.setFill(javafx.scene.paint.Color.GREEN); break;
-		}
-		// set the outline of the shape
-		s.setStroke(javafx.scene.paint.Color.BLUE); // outline
-		return s;
-	}
-
 	public static void paint(Critter C, int x_coor, int y_coor) {
 		//test for painting
 		double cell = Main.cell;
@@ -86,11 +67,7 @@ public class Painter {
 					cell*.3,cell*.6,
 					0.0, cell*.3,
 					cell*.4,cell*.3
-					
-					 
-					//(cell*3/4), (cell*3/4),
-					//(cell), (cell*3/4),
-					//(cell*0.8), (cell*3/4),
+
 			});
 				
 			s = star;

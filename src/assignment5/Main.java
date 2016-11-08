@@ -15,7 +15,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import static java.util.concurrent.TimeUnit.*;
 import javax.swing.Painter;
-
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -50,14 +49,10 @@ import javafx.util.Duration;
 import jdk.nashorn.internal.objects.annotations.SpecializedFunction;
 public class Main extends Application { 
 	
-	final static int worldWidth = 500;
+	private final static int worldWidth = 500;
 	public static GridPane grid = new GridPane();	// grid for show world
 	//static Canvas canvas = new Canvas(canvasWitdh,canvasHight);	// canvas for show world
 	public static int cell = worldWidth/Params.world_width;
-	static {	// set cell to proper value
-		if (Params.world_height*2/3>Params.world_width)
-			cell = worldWidth*2/3/Params.world_height;
-	}
 	// to redirect console:
 	private static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
 	private static PrintStream old = System.out;	// if you want to restore output to console
@@ -66,6 +61,10 @@ public class Main extends Application {
 	
 @Override public void start(Stage primaryStage) {
 	try {
+		Label welcomeLbl = new Label("Welcome to CritterLand!");
+		welcomeLbl.setFont(Font.font("Verdana", FontWeight.BOLD, 16));
+		if (Params.world_height*2/3>Params.world_width)
+			cell = worldWidth*2/3/Params.world_height;
 		List<Button> buttonList = new ArrayList<Button>();
 		final GridPane stageGrid = new GridPane();
 	    primaryStage.setTitle("Critters!");
@@ -115,7 +114,20 @@ public class Main extends Application {
 		flowMakeCrit.getChildren().add(makeCrt);
         flowMakeCrit.getChildren().add(critterList);
         flowMakeCrit.getChildren().add(numOfCrt);
+				
+		// run stats button
+		ComboBox critterListStats = new ComboBox(FXCollections.observableArrayList(critters));	//critter selection list for run stats
+		critterListStats.setPromptText("Select Critter");
+		Label statsLabel = new Label();
+		critterListStats.valueProperty().addListener(new ChangeListener<String>() {
+	        @Override
+	        public void changed(ObservableValue ov, String t, String t1) {
+	        	Main.showStats(statsLabel, critterListStats);
+	        }    
+	    });
 		
+		Label statsLbl = new Label("Show stats for Critter:   "); 
+
 		//Step Button 
         TextField numOfSteps = new TextField ();
 		numOfSteps.setPromptText("number of steps");
@@ -148,6 +160,7 @@ public class Main extends Application {
             		Critter.worldTimeStep();
             	}
             	Critter.displayWorld(); //display world after stepping
+            	Main.showStats(statsLabel, critterListStats);
             }
         });
 		
@@ -155,21 +168,8 @@ public class Main extends Application {
 		FlowPane flowStep = new FlowPane((Orientation.HORIZONTAL));
 		flowStep.getChildren().add(stepBtn);
 		flowStep.getChildren().add(numOfSteps);
-		
-		// run stats button
-		ComboBox critterListStats = new ComboBox(FXCollections.observableArrayList(critters));	//critter selection list for run stats
-		critterListStats.setPromptText("Select Critter");
-		Button statsBtn = new Button("Run Stats");
-		buttonList.add(statsBtn);
-		statsBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
-		Label statsLabel = new Label("Welcome to Critters");
-		statsBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-            	Main.showStats(statsLabel, critterListStats);
-            }
-        });
-		
+
+
 		//quit Button
 		Button quitBtn = new Button("Quit");
 		quitBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
@@ -182,7 +182,7 @@ public class Main extends Application {
 		
 		// run stats button layout
 		FlowPane flowStats = new FlowPane((Orientation.HORIZONTAL));
-		flowStats.getChildren().add(statsBtn);
+		flowStats.getChildren().add(statsLbl);
 		flowStats.getChildren().add(critterListStats);
 		//flowStats.getChildren().add();
 		
@@ -233,7 +233,41 @@ public class Main extends Application {
 			}
 		});
 		
+		// set seed button
+		TextField numOfSeed = new TextField ();
+		numOfSeed.setPromptText("seed number");
+		// force the field to be numeric only
+		numOfSeed.textProperty().addListener(new ChangeListener<String>() {
+	        @Override
+	        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	            if (!newValue.matches("\\d*")) {
+	            	numOfSeed.setText(newValue.replaceAll("[^\\d]", ""));
+	            }
+	        }
+	    });
+		
+		Button seedBtn = new Button("Set Seed");
+		buttonList.add(seedBtn);
+		seedBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		seedBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	if (!numOfSeed.getText().equals("")){
+            		Critter.setSeed(Integer.valueOf(numOfSeed.getText()));
+            		numOfSeed.clear();
+            	}
+            }
+        });
+		
+		FlowPane flowSeed = new FlowPane();
+		flowSeed.getChildren().add(seedBtn);
+		flowSeed.getChildren().add(numOfSeed);
+		
+		
 	    // add buttons into container
+		buttons.getChildren().add(welcomeLbl);
+		buttons.getChildren().add(new Label());
+		buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(flowMakeCrit);
 	    buttons.getChildren().add(errLbl);
 	    buttons.getChildren().add(flowStep);
@@ -245,9 +279,13 @@ public class Main extends Application {
 	    buttons.getChildren().add(new Label("animation speed:"));
 	    buttons.getChildren().add(slider);
 	    buttons.getChildren().add(new Label());
+	    buttons.getChildren().add(flowSeed);
+	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(quitBtn);
+	    
+	    //statsLabel.setStyle("-fx-border-color: blue; -fx-border: 200px solid;");
 	    
 	    statsLabel.setMaxWidth(140 + 10 + assignment5.Params.world_width);
 	    // TODO add a scroll wrap if surpasses stats max height
@@ -268,25 +306,13 @@ public class Main extends Application {
 	    if (gridWorldHight < 300)	// make sure that grade for world is not too small
 	    	gridWorldHight = 300;
 	    
-	    //background for world grid
-	    
-/*	    // Test for frame for world
-	    Canvas canvas = new Canvas(Params.world_width*cell,Params.world_height*cell);
-	    GraphicsContext gc = canvas.getGraphicsContext2D();
-	    gc.setFill(Color.CHARTREUSE);
-	    gc.fillRect(0,0,Params.world_width*cell,Params.world_height*cell);
-	    StackPane canvasPane = new StackPane();
-	    canvasPane.getChildren().add(canvas);
-	    canvasPane.getChildren().add(grid);
-	    stageGrid.add(canvasPane, 2, 1 ,1, 1);
-	    stageGrid.setGridLinesVisible(true); // for debug only
-*/	    
+
 	    stageGrid.getColumnConstraints().add(new ColumnConstraints(10));
 	    stageGrid.getColumnConstraints().add(new ColumnConstraints(400));
 	    stageGrid.getColumnConstraints().add(new ColumnConstraints(worldWidth + 50));
 	    
 	    stageGrid.getRowConstraints().add(new RowConstraints(10));
-	    stageGrid.getRowConstraints().add(new RowConstraints(gridWorldHight + 50));
+	    stageGrid.getRowConstraints().add(new RowConstraints(gridWorldHight + 70));
 	    stageGrid.getRowConstraints().add(new RowConstraints(100));
 	    Scene scene = new Scene(stageGrid);
 	    primaryStage.setScene(scene);
@@ -329,12 +355,14 @@ public static void main(String[] args) {
 							if (!Modifier.isAbstract(cls.getModifiers()) && (Critter.class.isAssignableFrom(cls))){
 								critterList.add(className);
 							}
+							
 						} catch (Exception e) {}	// gets the class from string
 	
 					}
 				}
 			}
 		}
+		critterList.add("Critter");
 		return critterList;
 	}
 	static void showStats(Label statsLabel, ComboBox critterListStats)	{
