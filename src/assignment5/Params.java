@@ -1,10 +1,20 @@
+/* Params.java
+ * EE422C Project 5 submission by
+ * Gilad Croll
+ * gc24654
+ * 16445
+ * Alejandro Stevenson-Duran
+ * as72948
+ * 16455
+ * Slip days used: <0>
+ * Fall 2016
+ */
+
 package assignment5;
 
 public class Params {
-	//public static int world_width = 160;
-	//public static int world_height = 80;
-	public static int world_width = 20;
-	public static int world_height = 20;
+	public static int world_width = 160;
+	public static int world_height = 80;
 	public static int walk_energy_cost = 2;
 	public static int run_energy_cost = 5;
 	public static int rest_energy_cost = 0;
