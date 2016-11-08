@@ -1,4 +1,4 @@
-/* CRITTERS Critter.java
+/* CRITTERS Painter.java
  * EE422C Project 5 submission by
  * Gilad Croll
  * gc24654
