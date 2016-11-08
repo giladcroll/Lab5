@@ -1,11 +1,10 @@
 /* CRITTERS Critter.java
- * EE422C Project 4 submission by
- * Replace <...> with your actual data.
+ * EE422C Project 5 submission by
  * Gilad Croll
- * GC24654
+ * gc24654
  * 16445
- * Alejandro Stevenson Duran
- * AS72948
+ * Alejandro Stevenson-Duran
+ * as72948
  * 16455
  * Slip days used: <0>
  * Fall 2016
