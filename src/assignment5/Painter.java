@@ -1,15 +1,15 @@
 /* CRITTERS Critter.java
- * EE422C Project 4 submission by
- * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
+ * EE422C Project 5 submission by
+ * Gilad Croll
+ * gc24654
+ * 16445
+ * Alejandro Stevenson-Duran
+ * as72948
+ * 16455
  * Slip days used: <0>
- * Fall 2015
+ * Fall 2016
  */
+
 package assignment5;
 
 import java.lang.reflect.Method;
