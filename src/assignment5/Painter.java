@@ -74,7 +74,7 @@ public class Painter {
 		}
 		
 		
-		s.setFill(C.viewColor());		
+		s.setFill(C.viewFillColor());		
 		s.setStroke(C.viewOutlineColor()); // outline
 		Main.grid.add((Shape) s, x_coor, y_coor); // add the shape to the grid.
 	}
