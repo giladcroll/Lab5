@@ -362,7 +362,7 @@ public static void main(String[] args) {
 				}
 			}
 		}
-		critterList.add("Critter");
+	//	critterList.add("Critter");
 		return critterList;
 	}
 	static void showStats(Label statsLabel, ComboBox critterListStats)	{
