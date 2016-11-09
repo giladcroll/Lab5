@@ -76,16 +76,16 @@ public abstract class Critter {
 		int stepNum=1;
 		int xToCheck = x_coord;
 		int yToCheck = y_coord;
-		if(steps == true)	
+		if(steps == true)
 			stepNum=2;	// if critter is running, step number is 2
 		if (direction == 0 || direction == 1 || direction == 7)
-			incrementCoord(xToCheck,Params.world_width);
+			for (int i=0;i<stepNum;i++){ xToCheck = incrementCoord(xToCheck,Params.world_width);}
 		if (direction == 3 || direction == 4 || direction == 5)
-			decrementCoord(xToCheck,Params.world_width);
+			for (int i=0;i<stepNum;i++){ xToCheck = decrementCoord(xToCheck,Params.world_width);}
 		if (direction == 5 || direction == 6 || direction == 7)
-			incrementCoord(yToCheck,Params.world_height);
+			for (int i=0;i<stepNum;i++){ yToCheck = incrementCoord(yToCheck,Params.world_height);}
 		if (direction == 1 || direction == 2 || direction == 3)
-			decrementCoord(yToCheck,Params.world_height);
+			for (int i=0;i<stepNum;i++){ yToCheck = decrementCoord(yToCheck,Params.world_height);}
 		energy -= Params.look_energy_cost; 
 		return isFreeLook(xToCheck, yToCheck, this);
 	}
