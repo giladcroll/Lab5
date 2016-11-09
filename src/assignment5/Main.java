@@ -58,7 +58,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import jdk.nashorn.internal.objects.annotations.SpecializedFunction;
+//import jdk.nashorn.internal.objects.annotations.SpecializedFunction;
 public class Main extends Application { 
 	
 	private final static int worldWidth = 500;
