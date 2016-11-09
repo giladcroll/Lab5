@@ -1,14 +1,3 @@
-/* CRITTERS Critter4.java
- * EE422C Project 5 submission by
- * Gilad Croll
- * gc24654
- * 16445
- * Alejandro Stevenson-Duran
- * as72948
- * 16455
- * Slip days used: <0>
- * Fall 2016
- */
 package assignment5;
 
 import assignment5.Critter.CritterShape;
@@ -39,7 +28,8 @@ public class Critter4 extends Critter {
 	
 	@Override
 	public void doTimeStep() {
-		if(currTemper.equals("tired") || (look(dir,false).equals("@"))){	
+		
+		if(currTemper.equals("tired") || "check".equals(look(dir,false)) ){
 			// do nothing
 		}
 		else{

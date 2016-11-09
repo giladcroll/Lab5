@@ -1,14 +1,3 @@
-/* CRITTERS Critter1.java
- * EE422C Project 5 submission by
- * Gilad Croll
- * gc24654
- * 16445
- * Alejandro Stevenson-Duran
- * as72948
- * 16455
- * Slip days used: <0>
- * Fall 2016
- */
 package assignment5;
 
 import assignment5.Critter.CritterShape;
@@ -34,7 +23,7 @@ public class Critter1 extends Critter2 {
 	
 	@Override
 	public void doTimeStep() {
-		if (Critter.getRandomInt(8) < 5 && (look(dir,false).equals(null))){	
+		if (Critter.getRandomInt(8) < 5 && (look(dir,false)==null)){	
 			walk(dir);
 		}
 		else

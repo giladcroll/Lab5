@@ -1,15 +1,3 @@
-/* CRITTERS Critter2.java
- * EE422C Project 5 submission by
- * Gilad Croll
- * gc24654
- * 16445
- * Alejandro Stevenson-Duran
- * as72948
- * 16455
- * Slip days used: <0>
- * Fall 2016
- */
-
 package assignment5;
 
 /**
@@ -45,7 +33,7 @@ public class Critter2 extends Critter{
 
 	@Override
 	public boolean fight(String oponent) {
-		if (getEnergy() < 50 || look(dir,false).equals(null)){	// if not much energy, try to walk away from battle
+		if (getEnergy() < 50 || look(dir,false)==null){	// if not much energy, try to walk away from battle
 			walk(dir);
 			return false;	
 		}
