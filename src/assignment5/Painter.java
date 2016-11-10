@@ -34,7 +34,7 @@ public class Painter {
 		if (critterShape.toString().equals("CIRCLE")){
 			s = new Circle(Main.cell/2);
 		}
-		else if (critterShape.toString().equals("RECTANGLE")){
+		else if (critterShape.toString().equals("SQUARE")){
 			s = new Rectangle(Main.cell,Main.cell);
 		}
 		else if (critterShape.toString().equals("TRIANGLE")){

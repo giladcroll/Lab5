@@ -58,7 +58,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-//import jdk.nashorn.internal.objects.annotations.SpecializedFunction;
+
 public class Main extends Application { 
 	
 	private final static int worldWidth = 500;
@@ -275,6 +275,16 @@ public class Main extends Application {
 		flowSeed.getChildren().add(seedBtn);
 		flowSeed.getChildren().add(numOfSeed);
 		
+		// clear world button
+		Button clearBtn = new Button("Clear World");
+		buttonList.add(clearBtn);
+		clearBtn.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		clearBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            		Critter.clearWorld();            	
+            }
+        });
 		
 	    // add buttons into container
 		buttons.getChildren().add(welcomeLbl);
@@ -292,6 +302,8 @@ public class Main extends Application {
 	    buttons.getChildren().add(slider);
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(flowSeed);
+	    buttons.getChildren().add(new Label());
+	    buttons.getChildren().add(clearBtn);
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(new Label());
 	    buttons.getChildren().add(new Label());
@@ -324,7 +336,7 @@ public class Main extends Application {
 	    stageGrid.getColumnConstraints().add(new ColumnConstraints(worldWidth + 50));
 	    
 	    stageGrid.getRowConstraints().add(new RowConstraints(10));
-	    stageGrid.getRowConstraints().add(new RowConstraints(gridWorldHight + 70));
+	    stageGrid.getRowConstraints().add(new RowConstraints(gridWorldHight + 110));
 	    stageGrid.getRowConstraints().add(new RowConstraints(100));
 	    Scene scene = new Scene(stageGrid);
 	    primaryStage.setScene(scene);

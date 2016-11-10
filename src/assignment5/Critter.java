@@ -107,7 +107,6 @@ public abstract class Critter {
 	
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
-		World world = new World();
 	}
 	
 	private static java.util.Random rand = new java.util.Random();
@@ -452,7 +451,7 @@ public abstract class Critter {
 	 */
 	public static void clearWorld() {
 		population = new java.util.ArrayList<Critter>(); 
-		World.clearMap();
+		Main.grid.getChildren().clear(); // clean up grid.
 	}
 	
 	public static void worldTimeStep()  {
